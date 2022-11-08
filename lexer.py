@@ -197,7 +197,7 @@ class Lexer:
             self.advance()
 
     def skip_comment(self):
-        while self.current_char != '}':
+        while self.current_char != ']' and self.peek() != ']':
             self.advance()
         self.advance()  # the closing curly brace
 
@@ -205,7 +205,8 @@ class Lexer:
         """Return a (multidigit) integer or float consumed from the input."""
 
         # Create a new token with current line and column number
-        token = Token(type=None, value=None, lineno=self.lineno, column=self.column)
+        token = Token(type=None, value=None,
+                      lineno=self.lineno, column=self.column)
 
         result = ''
         while self.current_char is not None and self.current_char.isdigit():
@@ -232,7 +233,8 @@ class Lexer:
         """Handle identifiers and reserved keywords"""
 
         # Create a new token with current line and column number
-        token = Token(type=None, value=None, lineno=self.lineno, column=self.column)
+        token = Token(type=None, value=None,
+                      lineno=self.lineno, column=self.column)
 
         value = ''
         while self.current_char is not None and self.current_char.isalnum():
