@@ -1,12 +1,7 @@
 a = b + c / 4
 g = 8
 a = 1>>2
-<< ==
+<< == and
+"\n\t" "my name is" 23 "niraj" 'kimng'
 
-"and", "break", "do", "else", "elseif",
-"end", "false", "for", "function", "goto", "if",
-"in", "local", "nil", "not", "or", "repeat",
-"return", "then", "true", "until", "while",
-"//", "..", "...", "==", ">=", "<=", "~=",
-"<<", ">>", "::", "<eof>",
-"<number>", "<integer>", "<name>", "<string>")
+name for if goto 

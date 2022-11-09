@@ -207,6 +207,27 @@ class Lexer:
                 self.advance()
             self.advance()
 
+    def read_string(self, delimit):
+        """Read a string literal token from the input.
+        The opening delimiter is passed as an argument.
+        """
+
+        token = Token(type=None, value=None,
+                      lineno=self.lineno, column=self.column)
+        string = ''
+        self.advance()
+        while self.current_char is not None and self.current_char != delimit:
+            string += self.current_char
+            self.advance()
+        self.advance()
+        try:
+            token.value = string
+            token.type = TokenType.STRING
+        except ValueError:
+            self.error()
+
+        return token
+
     def number(self):
         """Return a (multidigit) integer or float consumed from the input."""
 
@@ -276,6 +297,14 @@ class Lexer:
         apart into tokens. One token at a time.
         """
         while self.current_char is not None:
+            if self.current_char in "\r\n":
+                self.advance()
+                continue
+            # can be made more effifient by using a function to skip chunks
+            if self.current_char in " \f\t\v":
+                self.advance()
+                continue
+
             if self.current_char.isspace():
                 self.skip_whitespace()
                 continue
@@ -285,6 +314,9 @@ class Lexer:
                 self.advance()
                 self.skip_comment()
                 continue
+
+            if self.current_char == '"' or self.current_char == "'":
+                return self.read_string(self.current_char)
 
             if self.current_char.isalpha() or self.current_char == '_':
                 return self._id()
