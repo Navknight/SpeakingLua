@@ -192,15 +192,15 @@ class Lexer:
         else:
             return self.text[peek_pos]
 
-    #to be commented
-    def peek2(self , s : str):
+    # to be commented
+    def peek2(self, s: str):
         peek_pos = self.pos+1
         if self.text[self.peek_pos] in s:
             self.current_char += self.text[self.peek_pos]
             self.advance()
             return True
-        else: return False
-
+        else:
+            return False
 
     def skip_whitespace(self):
         while self.current_char is not None and self.current_char.isspace():
@@ -228,14 +228,14 @@ class Lexer:
             while self.current_char is not None and ((self.current_char.isdigit() or self.current_char in 'abcdefABCDEF') or (self.current_char == '.' and '.' not in result)):
                 result += self.current_char
                 self.advance()
-        else: 
+        else:
             while self.current_char is not None and self.current_char in '0123456789.' and '.' not in result:
                 result += self.current_char
                 self.advance()
-        if self.current_char is in 'a-zA-Z':
+        if self.current_char in 'a-zA-Z':
             self.error()
 
-        try: 
+        try:
             token.value = int(result)
             token.type = TokenType.INTEGER
         except ValueError:
@@ -244,7 +244,8 @@ class Lexer:
                 token.type = TokenType.NUMBER
             except ValueError:
                 try:
-                    token.value = float.fromhex(result) if '.' in result else int.fromhex(result)
+                    token.value = float.fromhex(
+                        result) if '.' in result else int.fromhex(result)
                     token.type = TokenType.NUMBER if '.' in result else TokenType.INTEGER
                 except ValueError:
                     self.error()
