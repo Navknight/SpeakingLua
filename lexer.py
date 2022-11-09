@@ -229,24 +229,25 @@ class Lexer:
                 result += self.current_char
                 self.advance()
         else: 
-            while self.current_char is not None and self.current_char in '0123456789.':
+            while self.current_char is not None and self.current_char in '0123456789.' and '.' not in result:
                 result += self.current_char
                 self.advance()
+        if self.current_char is in 'a-zA-Z':
+            self.error()
 
-        if self.current_char == '.':
-            result += self.current_char
-            self.advance()
-
-            while self.current_char is not None and self.current_char.isdigit():
-                result += self.current_char
-                self.advance()
-
-            token.type = TokenType.REAL_CONST
-            token.value = float(result)
-        else:
-            token.type = TokenType.INTEGER_CONST
+        try: 
             token.value = int(result)
-
+            token.type = TokenType.INTEGER
+        except ValueError:
+            try:
+                token.value = float(result)
+                token.type = TokenType.NUMBER
+            except ValueError:
+                try:
+                    token.value = float.fromhex(result) if '.' in result else int.fromhex(result)
+                    token.type = TokenType.NUMBER if '.' in result else TokenType.INTEGER
+                except ValueError:
+                    self.error()
         return token
 
     def _id(self):
