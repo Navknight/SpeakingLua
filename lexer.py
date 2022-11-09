@@ -201,7 +201,7 @@ class Lexer:
         if self.current_char == '[' and self.peek() == '[':
             self.advance()
             self.advance()
-            while self.current_char is not None and (self.text.substr(self.pos, 4) != '--]]'):
+            while self.current_char is not None and (self.text[self.pos: self.pos+4] != '--]]'):
                 self.advance()
             self.advance()
             self.advance()
@@ -266,7 +266,7 @@ class Lexer:
 
         token_type = RESERVED_KEYWORDS.get(value.upper())
         if token_type is None:
-            token.type = TokenType.ID
+            token.type = TokenType.IDENTIFIER
             token.value = value
         else:
             # reserved keyword
@@ -297,10 +297,10 @@ class Lexer:
             if self.current_char.isdigit():
                 return self.number()
 
-            if self.text.substr(self.pos, 3) == '...':
+            if self.text[self.pos: self.pos+3] == '...':
                 token = Token(
                     type=TokenType.ELLIPSIS,
-                    value=TokenType.ELLIPSIS.value, 
+                    value=TokenType.ELLIPSIS.value,
                     lineno=self.lineno,
                     column=self.column,
                 )
@@ -313,7 +313,8 @@ class Lexer:
             try:
                 # get enum member by value, e.g.
                 # TokenType(';') --> TokenType.SEMI
-                token_type = TokenType(self.current_char) or TokenType(self.current_char + self.text[self.pos + 1])
+                token_type = TokenType(self.current_char) or TokenType(
+                    self.current_char + self.text[self.pos + 1])
             except ValueError:
                 # no enum member with value equal to self.current_char
                 self.error()
