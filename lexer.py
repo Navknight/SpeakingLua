@@ -186,29 +186,19 @@ class Lexer:
             self.current_char = self.text[self.pos]
             self.column += 1
 
-    def peek1(self):
+    def peek(self):
         peek_pos = self.pos + 1
         if peek_pos > len(self.text) - 1:
             return None
         else:
             return self.text[peek_pos]
 
-    # to be commented
-    def peek2(self, s: str):
-        peek_pos = self.pos+1
-        if self.text[self.peek_pos] in s:
-            self.current_char += self.text[self.peek_pos]
-            self.advance()
-            return True
-        else:
-            return False
-
     def skip_whitespace(self):
         while self.current_char is not None and self.current_char.isspace():
             self.advance()
 
     def skip_comment(self):
-        if self.current_char == '[' and self.peek1() == '[':
+        if self.current_char == '[' and self.peek() == '[':
             self.advance()
             self.advance()
             while self.current_char is not None and (self.text.substr(self.pos, 4) != '--]]'):
@@ -230,7 +220,7 @@ class Lexer:
                       lineno=self.lineno, column=self.column)
 
         result = ''
-        if self.current_char == '0' and self.peek1() in 'xX':
+        if self.current_char == '0' and self.peek() in 'xX':
             # hexadecimal number
             result += self.current_char
             self.advance()
@@ -295,7 +285,7 @@ class Lexer:
                 self.skip_whitespace()
                 continue
 
-            if self.current_char == '-' and self.peek1() == '-':
+            if self.current_char == '-' and self.peek() == '-':
                 self.advance()
                 self.advance()
                 self.skip_comment()
