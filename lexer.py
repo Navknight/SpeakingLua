@@ -308,8 +308,11 @@ class Lexer:
             try:
                 # get enum member by value, e.g.
                 # TokenType(';') --> TokenType.SEMI
-                token_type = TokenType(self.current_char) or TokenType(
-                    self.current_char + self.text[self.pos + 1])
+                if self.current_char + self.text[self.pos + 1] in list(x.value for x in TokenType):
+                    token_type = TokenType(
+                        self.current_char + self.text[self.pos + 1])
+                else:
+                    token_type = TokenType(self.current_char)
             except ValueError:
                 # no enum member with value equal to self.current_char
                 self.error()
