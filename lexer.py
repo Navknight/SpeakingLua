@@ -208,9 +208,19 @@ class Lexer:
             self.advance()
 
     def skip_comment(self):
-        while self.current_char != ']' and self.peek1() != ']':
+        if self.current_char == '[' and self.peek1() == '[':
             self.advance()
-        self.advance()  # the closing curly brace
+            self.advance()
+            while self.current_char is not None and (self.text.substr(self.pos, 4) != '--]]'):
+                self.advance()
+            self.advance()
+            self.advance()
+            self.advance()
+            self.advance()
+        else:
+            while self.current_char is not None and (self.current_char != '\n'):
+                self.advance()
+            self.advance()
 
     def number(self):
         """Return a (multidigit) integer or float consumed from the input."""
@@ -285,7 +295,8 @@ class Lexer:
                 self.skip_whitespace()
                 continue
 
-            if self.current_char == '{':
+            if self.current_char == '-' and self.peek1() == '-':
+                self.advance()
                 self.advance()
                 self.skip_comment()
                 continue
@@ -296,10 +307,10 @@ class Lexer:
             if self.current_char.isdigit():
                 return self.number()
 
-            if self.current_char == ':' and self.peek1() == '=':
+            if self.current_char == '=' and self.peek1() == '=':
                 token = Token(
                     type=TokenType.ASSIGN,
-                    value=TokenType.ASSIGN.value,  # ':='
+                    value=TokenType.ASSIGN.value,  # '=='
                     lineno=self.lineno,
                     column=self.column,
                 )
