@@ -276,6 +276,14 @@ class Lexer:
         apart into tokens. One token at a time.
         """
         while self.current_char is not None:
+            if self.current_char in "\r\n":
+                self.advance()
+                continue
+            # can be made more effifient by using a function to skip chunks
+            if self.current_char in " \f\t\v":
+                self.advance()
+                continue
+
             if self.current_char.isspace():
                 self.skip_whitespace()
                 continue
