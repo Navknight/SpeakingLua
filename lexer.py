@@ -1,6 +1,7 @@
 # import argparse
 # import sys
 from enum import Enum
+import re
 
 # _SHOULD_LOG_SCOPE = False  # see '--scope' command line option
 # _SHOULD_LOG_STACK = False  # see '--stack' command line option
@@ -197,45 +198,69 @@ class Lexer:
             self.advance()
 
     def skip_comment(self):
-        while self.current_char != '}':
+        if self.current_char == '[' and self.peek() == '[':
             self.advance()
-        self.advance()  # the closing curly brace
+            self.advance()
+            while self.current_char is not None and (self.text.substr(self.pos, 4) != '--]]'):
+                self.advance()
+            self.advance()
+            self.advance()
+            self.advance()
+            self.advance()
+        else:
+            while self.current_char is not None and (self.current_char != '\n'):
+                self.advance()
+            self.advance()
 
     def number(self):
         """Return a (multidigit) integer or float consumed from the input."""
 
         # Create a new token with current line and column number
-        token = Token(type=None, value=None, lineno=self.lineno, column=self.column)
+        token = Token(type=None, value=None,
+                      lineno=self.lineno, column=self.column)
 
         result = ''
-        while self.current_char is not None and self.current_char.isdigit():
+        if self.current_char == '0' and self.peek() in 'xX':
+            # hexadecimal number
             result += self.current_char
             self.advance()
-
-        if self.current_char == '.':
             result += self.current_char
             self.advance()
-
-            while self.current_char is not None and self.current_char.isdigit():
+            while self.current_char is not None and ((self.current_char.isdigit() or self.current_char in 'abcdefABCDEF') or (self.current_char == '.' and '.' not in result)):
                 result += self.current_char
                 self.advance()
-
-            token.type = TokenType.REAL_CONST
-            token.value = float(result)
         else:
-            token.type = TokenType.INTEGER_CONST
-            token.value = int(result)
+            while self.current_char is not None and self.current_char in '0123456789.' and '.' not in result:
+                result += self.current_char
+                self.advance()
+        if re.search("[a-zA-Z]", self.current_char):
+            self.error()
 
+        try:
+            token.value = int(result)
+            token.type = TokenType.INTEGER
+        except ValueError:
+            try:
+                token.value = float(result)
+                token.type = TokenType.NUMBER
+            except ValueError:
+                try:
+                    token.value = float.fromhex(
+                        result) if '.' in result else int.fromhex(result)
+                    token.type = TokenType.NUMBER if '.' in result else TokenType.INTEGER
+                except ValueError:
+                    self.error()
         return token
 
     def _id(self):
         """Handle identifiers and reserved keywords"""
 
         # Create a new token with current line and column number
-        token = Token(type=None, value=None, lineno=self.lineno, column=self.column)
+        token = Token(type=None, value=None,
+                      lineno=self.lineno, column=self.column)
 
         value = ''
-        while self.current_char is not None and self.current_char.isalnum():
+        while self.current_char is not None and self.current_char.isalnum() or self.current_char == '_':
             value += self.current_char
             self.advance()
 
@@ -260,24 +285,26 @@ class Lexer:
                 self.skip_whitespace()
                 continue
 
-            if self.current_char == '{':
+            if self.current_char == '-' and self.peek() == '-':
+                self.advance()
                 self.advance()
                 self.skip_comment()
                 continue
 
-            if self.current_char.isalpha():
+            if self.current_char.isalpha() or self.current_char == '_':
                 return self._id()
 
             if self.current_char.isdigit():
                 return self.number()
 
-            if self.current_char == ':' and self.peek() == '=':
+            if self.text.substr(self.pos, 3) == '...':
                 token = Token(
-                    type=TokenType.ASSIGN,
-                    value=TokenType.ASSIGN.value,  # ':='
+                    type=TokenType.ELLIPSIS,
+                    value=TokenType.ELLIPSIS.value, 
                     lineno=self.lineno,
                     column=self.column,
                 )
+                self.advance()
                 self.advance()
                 self.advance()
                 return token
@@ -286,7 +313,7 @@ class Lexer:
             try:
                 # get enum member by value, e.g.
                 # TokenType(';') --> TokenType.SEMI
-                token_type = TokenType(self.current_char)
+                token_type = TokenType(self.current_char) or TokenType(self.current_char + self.text[self.pos + 1])
             except ValueError:
                 # no enum member with value equal to self.current_char
                 self.error()
@@ -298,7 +325,11 @@ class Lexer:
                     lineno=self.lineno,
                     column=self.column,
                 )
-                self.advance()
+                if len(token.value) == 2:
+                    self.advance()
+                    self.advance()
+                else:
+                    self.advance()
                 return token
 
         # EOF (end-of-file) token indicates that there is no more
