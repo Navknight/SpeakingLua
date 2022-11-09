@@ -1,6 +1,7 @@
 # import argparse
 # import sys
 from enum import Enum
+import re
 
 # _SHOULD_LOG_SCOPE = False  # see '--scope' command line option
 # _SHOULD_LOG_STACK = False  # see '--stack' command line option
@@ -232,7 +233,7 @@ class Lexer:
             while self.current_char is not None and self.current_char in '0123456789.' and '.' not in result:
                 result += self.current_char
                 self.advance()
-        if self.current_char in 'a-zA-Z':
+        if re.search("[a-zA-Z]", self.current_char):
             self.error()
 
         try:
