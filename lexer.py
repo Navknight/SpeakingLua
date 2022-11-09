@@ -185,19 +185,29 @@ class Lexer:
             self.current_char = self.text[self.pos]
             self.column += 1
 
-    def peek(self):
+    def peek1(self):
         peek_pos = self.pos + 1
         if peek_pos > len(self.text) - 1:
             return None
         else:
             return self.text[peek_pos]
 
+    #to be commented
+    def peek2(self , s : str):
+        peek_pos = self.pos+1
+        if self.text[self.peek_pos] in s:
+            self.current_char += self.text[self.peek_pos]
+            self.advance()
+            return True
+        else: return False
+
+
     def skip_whitespace(self):
         while self.current_char is not None and self.current_char.isspace():
             self.advance()
 
     def skip_comment(self):
-        while self.current_char != ']' and self.peek() != ']':
+        while self.current_char != ']' and self.peek1() != ']':
             self.advance()
         self.advance()  # the closing curly brace
 
@@ -209,9 +219,19 @@ class Lexer:
                       lineno=self.lineno, column=self.column)
 
         result = ''
-        while self.current_char is not None and self.current_char.isdigit():
+        if self.current_char == '0' and self.peek1() in 'xX':
+            # hexadecimal number
             result += self.current_char
             self.advance()
+            result += self.current_char
+            self.advance()
+            while self.current_char is not None and ((self.current_char.isdigit() or self.current_char in 'abcdefABCDEF') or (self.current_char == '.' and '.' not in result)):
+                result += self.current_char
+                self.advance()
+        else: 
+            while self.current_char is not None and self.current_char in '0123456789.':
+                result += self.current_char
+                self.advance()
 
         if self.current_char == '.':
             result += self.current_char
@@ -273,7 +293,7 @@ class Lexer:
             if self.current_char.isdigit():
                 return self.number()
 
-            if self.current_char == ':' and self.peek() == '=':
+            if self.current_char == ':' and self.peek1() == '=':
                 token = Token(
                     type=TokenType.ASSIGN,
                     value=TokenType.ASSIGN.value,  # ':='
