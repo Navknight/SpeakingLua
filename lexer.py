@@ -270,7 +270,7 @@ class Lexer:
                       lineno=self.lineno, column=self.column)
 
         value = ''
-        while self.current_char is not None and self.current_char.isalnum():
+        while self.current_char is not None and self.current_char.isalnum() or self.current_char == '_':
             value += self.current_char
             self.advance()
 
@@ -301,19 +301,20 @@ class Lexer:
                 self.skip_comment()
                 continue
 
-            if self.current_char.isalpha():
+            if self.current_char.isalpha() or self.current_char == '_':
                 return self._id()
 
             if self.current_char.isdigit():
                 return self.number()
 
-            if self.current_char == '=' and self.peek1() == '=':
+            if self.text.substr(self.pos, 3) == '...':
                 token = Token(
-                    type=TokenType.ASSIGN,
-                    value=TokenType.ASSIGN.value,  # '=='
+                    type=TokenType.ELLIPSIS,
+                    value=TokenType.ELLIPSIS.value, 
                     lineno=self.lineno,
                     column=self.column,
                 )
+                self.advance()
                 self.advance()
                 self.advance()
                 return token
@@ -322,7 +323,7 @@ class Lexer:
             try:
                 # get enum member by value, e.g.
                 # TokenType(';') --> TokenType.SEMI
-                token_type = TokenType(self.current_char)
+                token_type = TokenType(self.current_char) or TokenType(self.current_char + self.text[self.pos + 1])
             except ValueError:
                 # no enum member with value equal to self.current_char
                 self.error()
@@ -334,7 +335,11 @@ class Lexer:
                     lineno=self.lineno,
                     column=self.column,
                 )
-                self.advance()
+                if len(token.value) == 2:
+                    self.advance()
+                    self.advance()
+                else:
+                    self.advance()
                 return token
 
         # EOF (end-of-file) token indicates that there is no more
