@@ -214,18 +214,16 @@ class Lexer:
 
         token = Token(type=None, value=None,
                       lineno=self.lineno, column=self.column)
-        str = r''
+        string = ''
         self.advance()
-        while self.current_char is not None and (self.current_char == delimit and self.text[self.pos - 1] != '\\'):
-            if self.current_char == "\\" and self.peek() == delimit:
-                str += self.current_char
-                self.advance()
-                self.advance()
-            str += self.current_char
+        while self.current_char is not None and self.current_char != delimit:
+            string += self.current_char
             self.advance()
+        if self.current_char is None:
+            self.error()
         self.advance()
         try:
-            token.value = str
+            token.value = string
             token.type = TokenType.STRING
         except ValueError:
             self.error()
