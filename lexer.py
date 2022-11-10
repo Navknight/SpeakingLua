@@ -214,9 +214,31 @@ class Lexer:
 
         token = Token(type=None, value=None,
                       lineno=self.lineno, column=self.column)
-        string = ''
+
+        string = '' if delimit == "'" else ""
         self.advance()
         while self.current_char is not None and self.current_char != delimit:
+            if self.current_char == '\\':
+                match self.peek():
+                    case '"':
+                        string += '\"'
+                    case 'n':
+                        string += '\n'
+                    case '\\':
+                        string += '\\'
+                    case 'r':
+                        string += '\r'
+                    case "'":
+                        string += "\'"
+                    case "t":
+                        string += '\t'
+                    case "b":
+                        string += '\b'
+                    case "f":
+                        string += '\f'
+                self.advance()
+                self.advance()
+                continue
             string += self.current_char
             self.advance()
         if self.current_char is None:
