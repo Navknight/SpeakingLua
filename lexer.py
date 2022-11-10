@@ -214,14 +214,18 @@ class Lexer:
 
         token = Token(type=None, value=None,
                       lineno=self.lineno, column=self.column)
-        string = ''
+        str = r''
         self.advance()
         while self.current_char is not None and self.current_char != delimit:
-            string += self.current_char
+            if self.current_char == "\\" and self.peek() == delimit:
+                str += self.text[self.pos:self.pos+2]
+                self.advance()
+                self.advance()
+            str += self.current_char
             self.advance()
         self.advance()
         try:
-            token.value = string
+            token.value = str
             token.type = TokenType.STRING
         except ValueError:
             self.error()
@@ -261,7 +265,8 @@ class Lexer:
                 token.type = TokenType.NUMBER
             except ValueError:
                 try:
-                    token.value = float.fromhex(result) if '.' in result else int.fromhex(result)
+                    token.value = float.fromhex(
+                        result) if '.' in result else int.fromhex(result)
                     token.type = TokenType.NUMBER if '.' in result else TokenType.INTEGER
                 except ValueError:
                     self.error()

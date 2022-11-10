@@ -3,6 +3,7 @@ g = 8
 a = 1>>2
 << == and
 "\n\t" "my name is" 23 "niraj" 'kimng'
+"abhinav \'abhinav"
 abhinav is a beast + pro +89008798+ 8
 
 name for if goto 
