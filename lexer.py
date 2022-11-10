@@ -214,11 +214,35 @@ class Lexer:
 
         token = Token(type=None, value=None,
                       lineno=self.lineno, column=self.column)
-        string = ''
+
+        string = '' if delimit == "'" else ""
         self.advance()
         while self.current_char is not None and self.current_char != delimit:
+            if self.current_char == '\\':
+                match self.peek():
+                    case '"':
+                        string += '\"'
+                    case 'n':
+                        string += '\n'
+                    case '\\':
+                        string += '\\'
+                    case 'r':
+                        string += '\r'
+                    case "'":
+                        string += "\'"
+                    case "t":
+                        string += '\t'
+                    case "b":
+                        string += '\b'
+                    case "f":
+                        string += '\f'
+                self.advance()
+                self.advance()
+                continue
             string += self.current_char
             self.advance()
+        if self.current_char is None:
+            self.error()
         self.advance()
         try:
             token.value = string
@@ -246,14 +270,14 @@ class Lexer:
                 result += self.current_char
                 self.advance()
         else:
-            while self.current_char is not None and self.current_char in '0123456789.' and '.' not in result:
+            while self.current_char is not None and (self.current_char in '0123456789' or self.current_char == '.' and '.' not in result):
                 result += self.current_char
                 self.advance()
-        if self.current_char is not None and re.search("[a-zA-Z]", self.current_char):
-            self.error()
+            if self.current_char is not None and re.search("[a-zA-Z]", self.current_char):
+                self.error()
 
         try:
-            token.value = int(result)
+            token.value = int(result, 16)
             token.type = TokenType.INTEGER
         except ValueError:
             try:
@@ -297,11 +321,11 @@ class Lexer:
         apart into tokens. One token at a time.
         """
         while self.current_char is not None:
-            if self.current_char in "\r\n":
+            if self.current_char == '\n' or self.current_char == '\r':
                 self.advance()
                 continue
             # can be made more effifient by using a function to skip chunks
-            if self.current_char in " \f\t\v":
+            if self.current_char == '\f' or self.current_char == '\v' or self.current_char == 't':
                 self.advance()
                 continue
 
