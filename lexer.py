@@ -253,7 +253,7 @@ class Lexer:
             self.error()
 
         try:
-            token.value = int(result)
+            token.value = int(result, 16)
             token.type = TokenType.INTEGER
         except ValueError:
             try:
@@ -261,8 +261,7 @@ class Lexer:
                 token.type = TokenType.NUMBER
             except ValueError:
                 try:
-                    token.value = float.fromhex(
-                        result) if '.' in result else int.fromhex(result)
+                    token.value = float.fromhex(result) if '.' in result else int.fromhex(result)
                     token.type = TokenType.NUMBER if '.' in result else TokenType.INTEGER
                 except ValueError:
                     self.error()
