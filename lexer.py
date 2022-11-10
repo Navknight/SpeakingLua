@@ -304,7 +304,7 @@ class Lexer:
             value += self.current_char
             self.advance()
 
-        token_type = RESERVED_KEYWORDS.get(value.upper())
+        token_type = RESERVED_KEYWORDS.get(value)
         if token_type is None:
             token.type = TokenType.IDENTIFIER
             token.value = value
@@ -325,7 +325,7 @@ class Lexer:
                 self.advance()
                 continue
             # can be made more effifient by using a function to skip chunks
-            if self.current_char == '\f' or self.current_char == '\v' or self.current_char == 't':
+            if self.current_char == '\f' or self.current_char == '\v' or self.current_char == '\t':
                 self.advance()
                 continue
 

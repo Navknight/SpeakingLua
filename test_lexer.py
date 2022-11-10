@@ -11,6 +11,5 @@ def main():
             break
         print(tok)
 
-
 if __name__ == '__main__':
     main()
