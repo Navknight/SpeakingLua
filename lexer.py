@@ -270,11 +270,11 @@ class Lexer:
                 result += self.current_char
                 self.advance()
         else:
-            while self.current_char is not None and self.current_char in '0123456789.' and '.' not in result:
+            while self.current_char is not None and (self.current_char in '0123456789' or self.current_char == '.' and '.' not in result):
                 result += self.current_char
                 self.advance()
-        if self.current_char is not None and re.search("[a-zA-Z]", self.current_char):
-            self.error()
+            if self.current_char is not None and re.search("[a-zA-Z]", self.current_char):
+                self.error()
 
         try:
             token.value = int(result, 16)
