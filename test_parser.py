@@ -1,11 +1,11 @@
 import lexer as lx
-import ast as syntree
+import ast as syn
 
 def main():
     with open('test_lexer.txt') as f:
         text = f.read()
     lex = lx.Lexer(text)
-    par = syntree.Parser(lex)
+    par = syn.Parser(lex)
     result = par.parse()
     print(result)
     """while True:

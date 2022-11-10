@@ -89,7 +89,7 @@ class VarDecl(AST):
         self.var_node = var_node
 
 
-class Parser(object):
+class Parser:
     def __init__(self, lexer):
         self.lexer = lexer
         # set current token to the first token taken from the input
@@ -183,7 +183,7 @@ class Parser(object):
 
         results = [node]
 
-        while self.current_token.type != lx.TokenType.EOF:
+        while (self.current_token.type != lx.TokenType.EOF and self.current_token.type != lx.TokenType.END) :
             results.append(self.statement())
 
         return results
@@ -193,18 +193,21 @@ class Parser(object):
         statement : compound_statement
                   | assignment_statement
                   | empty
-        
+        """
         if self.current_token.type == lx.TokenType.IDENTIFIER:
             node = self.assignment_statement()
         elif self.current_token.type == lx.TokenType.IF:
             node = self.if_statement()
         elif self.current_token.type == lx.TokenType.WHILE:
             node = self.while_statement()
-        elif self.current_token.type == lx.TokenType.NULL:
+        elif self.current_token.type == lx.TokenType.NIL:
             node = self.empty()
-        else:"""
-        node = self.expr()
+        else:
+            node = self.conditional_statement()
         return node
+
+    ##def decider(self):
+    ###token = self.
 
 ####################################
 ####### ASSIGNMENT STATEMENT #######
@@ -282,10 +285,12 @@ class Parser(object):
         left = self.expr()
         token = self.current_token
         if (self.current_token.type in COMPARISON_OP):
-            self.eat(token)
+            self.eat(token.type)
         right = self.expr()
         node = Compare(left, token, right)
         return node
+
+
 
 #####################################
 #####################################
@@ -398,3 +403,20 @@ class Parser(object):
             self.error()
 
         return node
+
+
+def main():
+    with open('test_lexer.txt') as f:
+        text = f.read()
+    lex = lx.Lexer(text)
+    par = Parser(lex)
+    result = par.parse()
+    print(result)
+    """while True:
+        tok = lex.get_next_token()
+        if tok.value is None:
+            break
+        print(tok)"""
+
+if __name__ == '__main__':
+    main()
