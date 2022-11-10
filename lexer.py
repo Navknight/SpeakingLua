@@ -216,9 +216,9 @@ class Lexer:
                       lineno=self.lineno, column=self.column)
         str = r''
         self.advance()
-        while self.current_char is not None and self.current_char != delimit:
+        while self.current_char is not None and (self.current_char == delimit and self.text[self.pos - 1] != '\\'):
             if self.current_char == "\\" and self.peek() == delimit:
-                str += self.text[self.pos:self.pos+2]
+                str += self.current_char
                 self.advance()
                 self.advance()
             str += self.current_char
@@ -301,11 +301,11 @@ class Lexer:
         apart into tokens. One token at a time.
         """
         while self.current_char is not None:
-            if self.current_char in "\r\n":
+            if self.current_char == '\n' or self.current_char == '\r':
                 self.advance()
                 continue
             # can be made more effifient by using a function to skip chunks
-            if self.current_char in " \f\t\v":
+            if self.current_char == '\f' or self.current_char == '\v' or self.current_char == 't':
                 self.advance()
                 continue
 
