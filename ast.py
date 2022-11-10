@@ -1,5 +1,6 @@
 import lexer as lx
 
+
 class AST(object):
     pass
 
@@ -90,7 +91,7 @@ class VarDecl(AST):
 
 class Parser(object):
     def __init__(self, lexer):
-        self.lexer = lx.Lexer
+        self.lexer = lexer
         # set current token to the first token taken from the input
         self.current_token = self.lexer.get_next_token()
 
@@ -182,8 +183,7 @@ class Parser(object):
 
         results = [node]
 
-        while self.current_token.type == #NEWLINE:
-            #self.eat(TOKEN)
+        while self.current_token.type != lx.TokenType.EOF:
             results.append(self.statement())
 
         return results
@@ -193,17 +193,17 @@ class Parser(object):
         statement : compound_statement
                   | assignment_statement
                   | empty
-        """
-        if self.current_token.type == IDENTIFIER:
+        
+        if self.current_token.type == lx.TokenType.IDENTIFIER:
             node = self.assignment_statement()
-        elif self.current_token.type == IF:
+        elif self.current_token.type == lx.TokenType.IF:
             node = self.if_statement()
-        elif self.current_token.type == WHILE:
+        elif self.current_token.type == lx.TokenType.WHILE:
             node = self.while_statement()
-        elif self.current_token.type == NULL:
+        elif self.current_token.type == lx.TokenType.NULL:
             node = self.empty()
-        else:
-            node = self.expr()
+        else:"""
+        node = self.expr()
         return node
 
 ####################################
@@ -216,7 +216,7 @@ class Parser(object):
 
         left = self.variable()
         token = self.current_token
-        self.eat(ASSIGN)
+        self.eat(lx.TokenType.ASSIGN)
         right = self.expr()
         node = Assign(left, token, right)
         return node
@@ -226,20 +226,20 @@ class Parser(object):
 ####################################
 
     def if_statement(self):
-        if (self.current_token.type == IF):
-            self.eat(IF)
-        if (self.current_token.type == LPAREN):
-            self.eat(LPAREN)
+        if (self.current_token.type == lx.TokenType.IF):
+            self.eat(lx.TokenType.IF)
+        if (self.current_token.type == lx.TokenType.LPAREN):
+            self.eat(lx.TokenType.LPAREN)
         condition = self.conditional_statement()
-        if (self.current_token.type == RPAREN):
-            self.eat(RPAREN)
-        self.eat(THEN)
+        if (self.current_token.type == lx.TokenType.RPAREN):
+            self.eat(lx.TokenType.RPAREN)
+        self.eat(lx.TokenType.THEN)
         body = self.statement_list()
         orbody = []
-        if (self.current_token.type == ELSE):
-            self.eat(ELSE)
+        if (self.current_token.type == lx.TokenType.ELSE):
+            self.eat(lx.TokenType.ELSE)
             orbody = self.statement_list()
-        self.eat(END)
+        self.eat(lx.TokenType.END)
         node = If(condition, body, orbody)
         return node
 
@@ -249,16 +249,16 @@ class Parser(object):
 ####################################
 
     def while_statement(self):
-        if (self.current_token.type == WHILE):
-            self.eat(WHILE)
-        if (self.current_token.type == LPAREN):
-            self.eat(LPAREN)
+        if (self.current_token.type == lx.TokenType.WHILE):
+            self.eat(lx.TokenType.WHILE)
+        if (self.current_token.type == lx.TokenType.LPAREN):
+            self.eat(lx.TokenType.LPAREN)
         condition = self.conditional_statement()
-        if (self.current_token.type == RPAREN):
-            self.eat(RPAREN)
-        self.eat(DO)
+        if (self.current_token.type == lx.TokenType.RPAREN):
+            self.eat(lx.TokenType.RPAREN)
+        self.eat(lx.TokenType.DO)
         body = self.statement_list()
-        self.eat(END)
+        self.eat(lx.TokenType.END)
         node = If(condition, body)
         return node
 
@@ -272,12 +272,12 @@ class Parser(object):
         conditional_statement : expr COMPARISON_OP expr
         """
         COMPARISON_OP = {
-        EQUAL : '==',
-        NOTEQUAL : '~=',
-        LEQ : '<=',
-        GEQ : '>=',
-        LT : '<',
-        GT : '>',
+        lx.TokenType.EQUAL : '==',
+        lx.TokenType.NOTEQUAL : '~=',
+        lx.TokenType.LEQ : '<=',
+        lx.TokenType.GEQ : '>=',
+        lx.TokenType.LT : '<',
+        lx.TokenType.GT : '>',
         }
         left = self.expr()
         token = self.current_token
@@ -296,7 +296,7 @@ class Parser(object):
         variable : IDENTIFIER
         """
         node = Var(self.current_token)
-        self.eat(IDENTIFIER)
+        self.eat(lx.TokenType.IDENTIFIER)
         return node
 
     def empty(self):
@@ -309,12 +309,12 @@ class Parser(object):
         """
         node = self.term()
 
-        while self.current_token.type in (PLUS, MINUS):
+        while self.current_token.type in (lx.TokenType.PLUS, lx.TokenType.MINUS):
             token = self.current_token
-            if token.type == PLUS:
-                self.eat(PLUS)
-            elif token.type == MINUS:
-                self.eat(MINUS)
+            if token.type == lx.TokenType.PLUS:
+                self.eat(lx.TokenType.PLUS)
+            elif token.type == lx.TokenType.MINUS:
+                self.eat(lx.TokenType.MINUS)
 
             node = BinOp(left=node, op=token, right=self.term())
 
@@ -324,12 +324,12 @@ class Parser(object):
         """term : factor ((MUL |33 FLOAT_DIV) factor)*"""
         node = self.factor()
 
-        while self.current_token.type in (MUL, FLOAT_DIV):
+        while self.current_token.type in (lx.TokenType.MUL, lx.TokenType.FLOAT_DIV):
             token = self.current_token
-            if token.type == MUL:
-                self.eat(MUL)
-            elif token.type == FLOAT_DIV:
-                self.eat(FLOAT_DIV)
+            if token.type == lx.TokenType.MUL:
+                self.eat(lx.TokenType.MUL)
+            elif token.type == lx.TokenType.FLOAT_DIV:
+                self.eat(lx.TokenType.FLOAT_DIV)
 
             node = BinOp(left=node, op=token, right=self.factor())
 
@@ -339,29 +339,29 @@ class Parser(object):
         """factor : PLUS factor
                   | MINUS factor
                   | _CONST
-                  | REAL_CONST
+                  | NUMBER
                   | LPAREN expr RPAREN
                   | variable
         """
         token = self.current_token
-        if token.type == PLUS:
-            self.eat(PLUS)
+        if token.type == lx.TokenType.PLUS:
+            self.eat(lx.TokenType.PLUS)
             node = UnaryOp(token, self.factor())
             return node
-        elif token.type == MINUS:
-            self.eat(MINUS)
+        elif token.type == lx.TokenType.MINUS:
+            self.eat(lx.TokenType.MINUS)
             node = UnaryOp(token, self.factor())
             return node
-        elif token.type == INTEGER_CONST:
-            self.eat(INTEGER_CONST)
+        elif token.type == lx.TokenType.INTEGER:
+            self.eat(lx.TokenType.INTEGER)
             return Num(token)
-        elif token.type == REAL_CONST:
-            self.eat(REAL_CONST)
+        elif token.type == lx.TokenType.NUMBER:
+            self.eat(lx.TokenType.NUMBER)
             return Num(token)
-        elif token.type == LPAREN:
-            self.eat(LPAREN)
+        elif token.type == lx.TokenType.LPAREN:
+            self.eat(lx.TokenType.LPAREN)
             node = self.expr()
-            self.eat(RPAREN)
+            self.eat(lx.TokenType.RPAREN)
             return node
         else:
             node = self.variable()
@@ -387,14 +387,14 @@ class Parser(object):
         term : factor ((MUL | INTEGER_DIV | FLOAT_DIV) factor)*
         factor : PLUS factor
                | MINUS factor
-               | INTEGER_CONST
-               | REAL_CONST
+               | INTEGER
+               | NUMBER
                | LPAREN expr RPAREN
                | variable
         variable: IDENTIFIER
         """
         node = self.program()
-        if self.current_token.type != EOF:
+        if self.current_token.type != lx.TokenType.EOF:
             self.error()
 
         return node
