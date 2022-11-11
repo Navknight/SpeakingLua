@@ -127,48 +127,6 @@ class Parser:
         compound_statement_node = self.compound_statement()
         node = Block(compound_statement_node)
         return node
-    """
-    def declarations(self):
-        declarations : VAR (variable_declaration SEMI)+
-                        | empty
-        
-        declarations = []
-        if self.current_token.type == VAR:
-            self.eat(VAR)
-            while self.current_token.type == IDENTIFIER:
-                var_decl = self.variable_declaration()
-                declarations.extend(var_decl)
-
-        return declarations
-
-    def variable_declaration(self):
-        variable_declaration : IDENTIFIER (COMMA IDENTIFIER)* COLON type_spec
-        var_nodes = [Var(self.current_token)]  # first IDENTIFIER
-        self.eat(IDENTIFIER)
-
-        while self.current_token.type == COMMA:
-            self.eat(COMMA)
-            var_nodes.append(Var(self.current_token))
-            self.eat(IDENTIFIER)
-
-        var_declarations = [
-            VarDecl(var_node)
-            for var_node in var_nodes
-        ]
-        return var_declarations
-
-    def type_spec(self):
-        type_spec : INTEGER
-                     | REAL
-        
-        token = self.current_token
-        if self.current_token.type == INTEGER:
-            self.eat(INTEGER)
-        else:
-            self.eat(REAL)
-        node = Type(token)
-        return node
-    """
 
     def compound_statement(self):
         
@@ -428,31 +386,7 @@ class Parser:
             return node
 
     def parse(self):
-        """
-        program : PROGRAM variable SEMI block DOT
-        block : declarations compound_statement
-        declarations : VAR (variable_declaration SEMI)+
-                     | empty
-        variable_declaration : IDENTIFIER (COMMA IDENTIFIER)* COLON type_spec
-        type_spec : INTEGER | REAL
-        compound_statement : BEGIN statement_list END
-        statement_list : statement
-                       | statement SEMI statement_list
-        statement : compound_statement
-                  | assignment_statement
-                  | empty
-        assignment_statement : variable ASSIGN expr
-        empty :
-        expr : term ((PLUS | MINUS) term)*
-        term : factor ((MUL | INTEGER_DIV | FLOAT_DIV) factor)*
-        factor : PLUS factor
-               | MINUS factor
-               | INTEGER
-               | NUMBER
-               | LPAREN expr RPAREN
-               | variable
-        variable: IDENTIFIER
-        """
+
         node = self.program()
         if self.current_token.type != lx.TokenType.EOF:
             self.error()
