@@ -91,11 +91,6 @@ class Block(AST):
         self.compound_statement = compound_statement
 
 
-class VarDecl(AST):
-    def __init__(self, var_node):
-        self.var_node = var_node
-
-
 class Parser:
     def __init__(self, lexer):
         self.lexer = lexer
@@ -159,7 +154,9 @@ class Parser:
                   | assignment_statement
                   | empty
         """
-        if self.current_token.type == lx.TokenType.IDENTIFIER:
+        if self.current_token.type == lx.TokenType.PRINT:
+            node = self.print_statement()
+        elif self.current_token.type == lx.TokenType.IDENTIFIER:
             node = self.assignment_statement()
         elif self.current_token.type == lx.TokenType.IF:
             node = self.if_statement()
@@ -173,6 +170,23 @@ class Parser:
 
     ##def decider(self):
     ###token = self.
+
+
+####################################
+######### PRINT STATEMENT ##########
+####################################
+
+    def print_statement(self):
+        """
+        print_statement : print LPAREN expr RPAREN
+        """
+
+        self.eat(lx.TokenType.PRINT)
+        token = self.current_token
+        self.eat(lx.TokenType.LPAREN)
+        node = self.parent_expr()
+        self.eat(lx.TokenType.RPAREN)
+        return node    
 
 ####################################
 ####### ASSIGNMENT STATEMENT #######
