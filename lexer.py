@@ -17,6 +17,7 @@ class Error(Exception):
 
 
 class LexerError(Error):
+    # print(Error)
     pass
 
 
@@ -63,21 +64,21 @@ class TokenType(Enum):
     WHILE = 'while'
 
     # single-character token types
-    PLUS = '+'
-    MINUS = '-'
-    MUL = '*'
-    FLOAT_DIV = '/'
-    PERCENT = '%'
-    EXP = '^'
-    SH = '#'
-    EQUAL = '=='
-    NOTEQUAL = '~='
-    LEQ = '<='
-    GEQ = '>='
-    LT = '<'
-    GT = '>'
-    ASSIGN = '='
-    LPAREN = '('
+    PLUS = '+' # +
+    MINUS = '-' # unary minus
+    MUL = '*'  # multiplication
+    FLOAT_DIV = '/' # float division
+    PERCENT = '%' # modulo
+    EXP = '^' # exponentiation
+    SH = '#' # length operator
+    EQUAL = '==' # equality
+    NOTEQUAL = '~=' # inequality
+    LEQ = '<=' # less than or equal to
+    GEQ = '>=' # greater than or equal to
+    LT = '<'    # less than
+    GT = '>'   # greater than
+    ASSIGN = '=' # assignment
+    LPAREN = '(' # left parenthesis
     RPAREN = ')'
     LBRACE = '{'
     RBRACE = '}'
@@ -167,7 +168,9 @@ class Lexer:
             lineno=self.lineno,
             column=self.column,
         )
-        raise LexerError(message=s)
+        print(s)
+        exit()
+        # raise LexerError(s)
 
     def advance(self):
         """Advance the `pos` pointer and set the `current_char` variable."""
