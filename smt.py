@@ -38,7 +38,9 @@ class Semantiff:
             elif node.token==lx.TokenType.MINUS:
                 return -self.evaulate(node.expr)
             else:
-                raise Exception("Unrecognised unary operator")
+                raise Exception("Unrecognised unary operator: "+node)
+                
+        
         elif type(node)==ast.BinOp:
             if node.right.value==lx.NIL or node.right.value==lx.NIL:
                 return lx.NIL
@@ -57,6 +59,18 @@ class Semantiff:
                 return self.evaluate(node.left)-self.evaluate(node.right)
             
             else:
-                raise Exception("Unrecognised binary operator")
+                raise Exception("Unrecognised binary operator: "+node)
+                
+                
+        elif type(node)==ast.While:
+            a = 0
+            while self.evaluate(node.test):
+                a=self.evaluate(node.body)
+            return a
+        
+        elif type(node)==ast.If:
+            if self.evaluate(node.test):
+                return self.evaluate(node.body)
+            
         else:
             raise Exception("Unexpected token error: "+node)
