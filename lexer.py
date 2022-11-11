@@ -97,6 +97,7 @@ class TokenType(Enum):
     DSLASH = '//'
     TILDE = '~'
 
+    #keywords in lua
     EOF = '<eof>'
     NUMBER = '<number>'
     INTEGER = '<integer>'
@@ -364,9 +365,12 @@ class Lexer:
             try:
                 # get enum member by value, e.g.
                 # TokenType(';') --> TokenType.SEMI
-                if self.current_char + self.text[self.pos + 1] in list(x.value for x in TokenType):
-                    token_type = TokenType(
-                        self.current_char + self.text[self.pos + 1])
+                if len(self.text) > (self.pos + 1):
+                    if self.current_char + self.text[self.pos + 1] in list(x.value for x in TokenType):
+                        token_type = TokenType(
+                            self.current_char + self.text[self.pos + 1])
+                    else:
+                        token_type = TokenType(self.current_char)
                 else:
                     token_type = TokenType(self.current_char)
             except ValueError:
