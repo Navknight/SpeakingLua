@@ -62,6 +62,7 @@ class TokenType(Enum):
     TRUE = 'true'
     UNTIL = 'until'
     WHILE = 'while'
+    PRINT = 'print'
 
     # single-character token types
     PLUS = '+' # +
