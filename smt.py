@@ -5,9 +5,9 @@ def bool(expr):
     return expr!=lx.TokenType.NIL && expr!=False
 
 class Semantiff:
-    def __init__(self, parser, code):
+    def __init__(self, parser):
         self.parser=parser
-        self.ast=parser.parse(code) #Directly storing the AST
+        self.ast=parser.parse() #Directly storing the AST
         self.symtab={}
     
     def create_variable(varname, value):
