@@ -4,7 +4,7 @@ import lexer as lx
 class AST(object):
     pass
 
-class While(AST):
+class While(AST): #while loop
     def __init__(self, test, body):
         self.test = test
         self.body = body
