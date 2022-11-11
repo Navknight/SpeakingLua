@@ -190,7 +190,7 @@ class Parser:
 
         results = [node]
 
-        while (self.current_token.type != lx.TokenType.EOF and self.current_token.type != lx.TokenType.END) :
+        while (self.current_token.type not in (lx.TokenType.EOF, lx.TokenType.END, lx.TokenType.ELSEIF, lx.TokenType.ELSE) ):
             results.append(self.statement())
 
         return results
@@ -227,7 +227,7 @@ class Parser:
         left = self.variable()
         token = self.current_token
         self.eat(lx.TokenType.ASSIGN)
-        right = self.expr()
+        right = self.parent_expr()
         node = Assign(left, token, right)
         return node
 
