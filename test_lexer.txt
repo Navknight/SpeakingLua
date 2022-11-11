@@ -1,6 +1,9 @@
+a=5
+b=3
+c=10
+if (a>3) then
+a= a+1
+elseif (b<4) then
+b = b+1
 
-0xab.a
-0xab
-27
-56
-5 (9)
+end
