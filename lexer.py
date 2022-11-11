@@ -278,19 +278,19 @@ class Lexer:
                 self.error()
 
         try:
-            token.value = int(result, 16)
+            token.value = int(result,10) if 'x' not in result else int(result,16)
             token.type = TokenType.INTEGER
         except ValueError:
-            try:
-                token.value = float(result)
+            #try:
+                token.value = float(result) if 'x' not in result else float.fromhex(result)
                 token.type = TokenType.NUMBER
-            except ValueError:
-                try:
-                    token.value = float.fromhex(
-                        result) if '.' in result else int.fromhex(result)
-                    token.type = TokenType.NUMBER if '.' in result else TokenType.INTEGER
-                except ValueError:
-                    self.error()
+            #except ValueError:
+                # try:
+                #     token.value = float.fromhex(
+                #         result) if '.' in result else int.fromhex(result)
+                #     token.type = TokenType.NUMBER if '.' in result else TokenType.INTEGER
+                # except ValueError:
+                #     self.error()
         return token
 
     def _id(self):
