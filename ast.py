@@ -22,9 +22,11 @@ class BinOp(AST):
         self.right = right"""
 
 class If(AST):
-    def __init__(self, test, body, orelse):
+    def __init__(self, test, body, elseif_body, orelse):
         self.test = test
+        self.elseif_body = elseif_body
         self.body = body
+        
         self.orelse = orelse
     
 class ElseIf(AST):
@@ -243,12 +245,24 @@ class Parser:
             self.eat(lx.TokenType.RPAREN)
         self.eat(lx.TokenType.THEN)
         body = self.statement_list()
+        elifs = []
+        while (self.current_token.type == lx.TokenType.ELSEIF):
+            self.eat(lx.TokenType.ELSEIF)
+            if (self.current_token.type == lx.TokenType.LPAREN):
+                self.eat(lx.TokenType.LPAREN)
+            elseif_condition = self.conditional_statement()
+            if (self.current_token.type == lx.TokenType.RPAREN):
+                self.eat(lx.TokenType.RPAREN)
+            self.eat(lx.TokenType.THEN)
+            elseif_body = self.statement_list() 
+            elifnode = ElseIf(elseif_condition, elseif_body)
+            elifs.append(elifnode)
         orbody = []
         if (self.current_token.type == lx.TokenType.ELSE):
             self.eat(lx.TokenType.ELSE)
             orbody = self.statement_list()
         self.eat(lx.TokenType.END)
-        node = If(condition, body, orbody)
+        node = If(condition, body, elifs, orbody)
         return node
 
 
