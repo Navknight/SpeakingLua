@@ -9,7 +9,7 @@ def main():
         text = f.read()
     lex = lx.Lexer(text)
     par = syn.Parser(lex)
-    smtff = tiff.Sematiff(par)
+    smtff = tiff.Semantiff(par)
     result = smtff.evaluate(result.ast)
     print(result)
     """while True:

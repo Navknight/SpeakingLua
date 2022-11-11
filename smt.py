@@ -2,7 +2,7 @@ import lexer as lx
 import ast
 
 def bool(expr):
-    return expr!=lx.TokenType.NIL && expr!=False
+    return expr!=lx.TokenType.NIL and expr!=False
 
 class Semantiff:
     def __init__(self, parser):
