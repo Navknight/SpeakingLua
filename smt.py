@@ -17,10 +17,11 @@ class Semantiff:
         del self.symtab[varname]
 
     def find(self):
+        self.ast=self.parser.parse()
         return self.evaluate(self.ast)
         
     def evaluate(self, node):
-        print(node)
+        #print(node)
 
         if node==None: #3
             return lx.TokenType.NIL

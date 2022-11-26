@@ -10,8 +10,8 @@ def main():
     lex = lx.Lexer(text)
     par = syn.Parser(lex)
     smtff = tiff.Semantiff(par)
-    result = smtff.find()
-    print(result)
+    smtff.find()
+    print(smtff.symtab)
     """while True:
         tok = lex.get_next_token()
         if tok.value is None:
