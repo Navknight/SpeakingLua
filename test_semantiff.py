@@ -10,7 +10,7 @@ def main():
     lex = lx.Lexer(text)
     par = syn.Parser(lex)
     smtff = tiff.Semantiff(par)
-    result = smtff.evaluate(result.ast)
+    result = smtff.find()
     print(result)
     """while True:
         tok = lex.get_next_token()

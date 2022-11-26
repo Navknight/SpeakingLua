@@ -10,13 +10,18 @@ class Semantiff:
         self.ast=parser.parse() #Directly storing the AST
         self.symtab={}
     
-    def create_variable(varname, value):
-        symtab[varname]=value
+    def create_variable(self, varname, value):
+        self.symtab[varname]=value
     
-    def flush(varname):
-        del symtab[varname]
+    def flush(self, varname):
+        del self.symtab[varname]
+
+    def find(self):
+        return self.evaluate(self.ast)
         
-    def evaluate(node):
+    def evaluate(self, node):
+        print(node)
+
         if node==None: #3
             return lx.TokenType.NIL
         
@@ -27,17 +32,14 @@ class Semantiff:
             return node.value
         
         elif type(node)==ast.Var: #RHS variable
-            if symtab.has_key(node.value): #The 'value' is the variable name here
-                return symtab[node.value]
+            if node.value in self.symtab: #The 'value' is the variable name here
+                return self.symtab[node.value]
             else: return lx.TokenType.NIL
-        
-        elif type(node)==ast.VarDecl:
-            return node.value
         
         elif type(node)==ast.Assign:
             self.create_variable(node.left.value, self.evaluate(node.right))
             
-            if symtab[node.left.value]==lx.TokenType.NIL: #Clear unnecessary space
+            if self.symtab[node.left.value]==lx.TokenType.NIL: #Clear unnecessary space
                 self.flush(node.left.value)
             return lx.TokenType.NIL
         
@@ -49,12 +51,12 @@ class Semantiff:
             if node.token==lx.TokenType.NOT:
                 return not bool(self.evaluate(node.expr))
             else:
-                raise Exception("Unrecognised unary operator: "+node)
+                raise Exception("Unrecognised unary operator: "+str(node.token))
                 
                 
         #Binary operation
         elif type(node)==ast.BinOp:
-            
+            node.token=node.token.type
             # SCC Booleans
             if node.token==lx.TokenType.OR:
                 cond = self.evaluate(node.left)
@@ -88,7 +90,7 @@ class Semantiff:
                 return self.evaluate(node.left)-self.evaluate(node.right)
             
             else:
-                raise Exception("Unrecognised binary operator: "+node)
+                raise Exception("Unrecognised binary operator: "+str(node.token))
                 
          
         #While loop
@@ -99,16 +101,55 @@ class Semantiff:
             return a
         
         
+        if type(node)==ast.Compare:
+            if (type(node.left)==ast.Var):
+                node.left=self.symtab[node.left.token.value]
+
+            if (type(node.right)==ast.Var):
+                node.right=self.symtab[node.right.token.value]
+
+            if (type(node.left)==ast.Num):
+                node.left=node.left.value
+            if (type(node.right)==ast.Num):
+                node.right=node.right.value
+
+            if (node.left==lx.TokenType.NIL or node.right==lx.TokenType.NIL):
+                return lx.TokenType.NIL
+            else:
+                if node.op.type==lx.TokenType.GT:
+                    return node.left>node.right
+                elif node.op.type==lx.TokenType.LT:
+                    return node.left<node.right
+                elif node.op.type==lx.TokenType.GEQ:
+                    return node.left>=node.right
+                elif node.op.type==lx.TokenType.LEQ:
+                    return node.left<=node.right
+                elif node.op.type==lx.TokenType.EQUAL:
+                    return node.left==node.right
+                elif node.op.type==lx.TokenType.NOTEQUAL:
+                    return node.left!=node.right
+                else:
+                    raise Exception("Unrecognised compare operator: "+str(node.op))
+
         #If-elif-else ladder
-        elif type(node)==ast.Else:
-            return self.evaluate(node.body)
-        
         elif type(node)==ast.If:
             if self.evaluate(node.test):
                 return self.evaluate(node.body)
             else:
                 return self.evaluate(node.alt)
             
+
+        if type(node)==ast.Compound:
+            a=self.evaluate(node.children[0])
+            for stmt in node.children[1:]:
+                self.evaluate(stmt)
+            return a
+
+        if type(node)==ast.Block:
+            return self.evaluate(node.compound_statement)
+
+        if type(node)==ast.Program:
+            return self.evaluate(node.block)
         # Find weird tokens    
         else:
-            raise Exception("Unexpected token error: "+node)
+            raise Exception("Unexpected token error: "+str(type(node)))

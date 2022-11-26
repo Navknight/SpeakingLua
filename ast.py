@@ -211,7 +211,8 @@ class Parser:
         if (self.current_token.type == lx.TokenType.RPAREN):
             self.eat(lx.TokenType.RPAREN)
         self.eat(lx.TokenType.THEN)
-        body = self.statement_list()
+        body = Compound()
+        body.children=self.statement_list()
         alt = None
         #Elseif Part
         flag = 0
@@ -221,7 +222,8 @@ class Parser:
 
         if (flag ==0  and self.current_token.type == lx.TokenType.ELSE):
             self.eat(lx.TokenType.ELSE)
-            alt = self.statement_list()
+            alt = Compound()
+            alt.children=self.statement_list()
         self.eat(lx.TokenType.END)
         node = If(condition, body, alt)
         return node
@@ -234,13 +236,15 @@ class Parser:
         if (self.current_token.type == lx.TokenType.RPAREN):
             self.eat(lx.TokenType.RPAREN)
         self.eat(lx.TokenType.THEN)
-        elseif_body = self.statement_list() 
+        elseif_body = Compound()
+        elseif_body.children=self.statement_list()
         alt= None
         while (self.current_token.type == lx.TokenType.ELSEIF):
             alt = self.elseif_statement()
         if (self.current_token.type == lx.TokenType.ELSE):
             self.eat(lx.TokenType.ELSE)
-            alt = self.statement_list()
+            alt = Compound()
+            alt.children=self.statement_list()
         elifnode = If(elseif_condition, elseif_body,alt)
 
         return elifnode
