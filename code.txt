@@ -11,10 +11,3 @@ then
 else
     a=a*40
 end
-
-a=2
-b=1
-while (b<=10) do
-print(a*b)
-b = b + 1
-end
