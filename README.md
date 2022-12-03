@@ -22,7 +22,7 @@ Input: A stream of characters i.e. string
 Output: The next token(number/identifier/keyword/...)
 
 ## Parser
-#### Teja and Keshav
+#### B Teja and Keshav
 Input: A list of tokens one at a time, with a lookahead of 1 token.
 
 Output: The AST(Abstract Syntax Tree)
@@ -32,3 +32,5 @@ Output: The AST(Abstract Syntax Tree)
 Input: AST
 
 Output: Execution
+
+
