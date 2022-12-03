@@ -1,5 +1,5 @@
 import lexer as lx
-import ast as syn
+import astt as syn
 import smt as tiff
 
 def main():

@@ -99,10 +99,10 @@ class Parser:
         # type and if they match then "eat" the current token
         # and assign the next token to the self.current_token,
         # otherwise raise an exception.
-        # if self.current_token.type == token_type:
+        if self.current_token.type == token_type:
             self.current_token = self.lexer.get_next_token()
-        # else:
-            # self.error()
+        else:
+            self.error()
 
     def program(self):
         #program : PROGRAM variable SEMI block DOT
@@ -422,7 +422,7 @@ class Parser:
 
 
 def main():
-    with open('test_lexer.txt') as f:
+    with open('code.txt') as f:
         text = f.read()
     lex = lx.Lexer(text)
     par = Parser(lex)
