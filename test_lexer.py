@@ -2,7 +2,7 @@ import lexer as lx
 
 
 def main():
-    with open('code.txt', 'r') as f:
+    with open('test_lexer.txt', 'r') as f:
         text = f.read()
     lex = lx.Lexer(text)
     while True:
@@ -10,6 +10,7 @@ def main():
         if tok.value is None:
             break
         print(tok)
+
 
 if __name__ == '__main__':
     main()

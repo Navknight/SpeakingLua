@@ -65,21 +65,21 @@ class TokenType(Enum):
     FUNCTION = 'function'
 
     # single-character token types
-    PLUS = '+' # +
-    MINUS = '-' # unary minus
+    PLUS = '+'  # +
+    MINUS = '-'  # unary minus
     MUL = '*'  # multiplication
-    FLOAT_DIV = '/' # float division
-    PERCENT = '%' # modulo
-    EXP = '^' # exponentiation
-    SH = '#' # length operator
-    EQUAL = '==' # equality
-    NOTEQUAL = '~=' # inequality
-    LEQ = '<=' # less than or equal to
-    GEQ = '>=' # greater than or equal to
+    FLOAT_DIV = '/'  # float division
+    PERCENT = '%'  # modulo
+    EXP = '^'  # exponentiation
+    SH = '#'  # length operator
+    EQUAL = '=='  # equality
+    NOTEQUAL = '~='  # inequality
+    LEQ = '<='  # less than or equal to
+    GEQ = '>='  # greater than or equal to
     LT = '<'    # less than
     GT = '>'   # greater than
-    ASSIGN = '=' # assignment
-    LPAREN = '(' # left parenthesis
+    ASSIGN = '='  # assignment
+    LPAREN = '('  # left parenthesis
     RPAREN = ')'
     LBRACE = '{'
     RBRACE = '}'
@@ -141,7 +141,7 @@ def _build_reserved_keywords():
     # enumerations support iteration, in definition order
     tt_list = list(TokenType)
     start_index = 0
-    end_index = tt_list.index(TokenType.WHILE)
+    end_index = tt_list.index(TokenType.FUNCTION)
     reserved_keywords = {
         token_type.value: token_type
         for token_type in tt_list[start_index:end_index + 1]
@@ -282,19 +282,21 @@ class Lexer:
                 self.error()
 
         try:
-            token.value = int(result,10) if 'x' not in result else int(result,16)
+            token.value = int(
+                result, 10) if 'x' not in result else int(result, 16)
             token.type = TokenType.INTEGER
         except ValueError:
-            #try:
-                token.value = float(result) if 'x' not in result else float.fromhex(result)
-                token.type = TokenType.NUMBER
-            #except ValueError:
-                # try:
-                #     token.value = float.fromhex(
-                #         result) if '.' in result else int.fromhex(result)
-                #     token.type = TokenType.NUMBER if '.' in result else TokenType.INTEGER
-                # except ValueError:
-                #     self.error()
+            # try:
+            token.value = float(
+                result) if 'x' not in result else float.fromhex(result)
+            token.type = TokenType.NUMBER
+            # except ValueError:
+            # try:
+            #     token.value = float.fromhex(
+            #         result) if '.' in result else int.fromhex(result)
+            #     token.type = TokenType.NUMBER if '.' in result else TokenType.INTEGER
+            # except ValueError:
+            #     self.error()
         return token
 
     def _id(self):
