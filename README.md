@@ -34,5 +34,3 @@ Input: AST
 Output: Execution
 
 
-NOTE: The code is run through test_semantiff.py
-If you want to edit the code, you can do it in code.txt

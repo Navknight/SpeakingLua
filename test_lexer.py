@@ -2,7 +2,7 @@ import lexer as lx
 
 
 def main():
-    with open('code.txt') as f:
+    with open('code.txt', 'r') as f:
         text = f.read()
     lex = lx.Lexer(text)
     while True:
