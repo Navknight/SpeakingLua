@@ -3,11 +3,9 @@
 Lua is dynamically typed and needs no explicit casts for type. Check the [Lua reference manual](https://www.lua.org/manual/) for details.  
 The interfaces for our code and the meaning of each step can be found [here](https://ruslanspivak.com/lsbasi-part7/). The given is part 7, the bare minimum to get started.
 
-##### Update!
-We're done with our basic coding stuff, so let's go to the testing!  
-Every file is tested using test_*.py
-
-Lastly, we may want a dedicated handler program
+##### How to Use
+Run test_semantiff.py
+The code in code.txt is run and the variables are outputted at program end.
 
 ## Lexer
 #### Niraj and Abhinav

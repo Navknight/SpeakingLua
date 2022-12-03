@@ -422,7 +422,7 @@ class Parser:
 
 
 def main():
-    with open('test_lexer.txt') as f:
+    with open('code.txt') as f:
         text = f.read()
     lex = lx.Lexer(text)
     par = Parser(lex)

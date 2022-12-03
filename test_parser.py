@@ -1,8 +1,8 @@
 import lexer as lx
-import ast as syn
+import astt as syn
 
 def main():
-    with open('test_lexer.txt') as f:
+    with open('code.txt') as f:
         text = f.read()
     lex = lx.Lexer(text)
     par = syn.Parser(lex)

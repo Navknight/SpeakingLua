@@ -1,156 +1,167 @@
 import lexer as lx
-import ast
+import astt
+
 
 def bool(expr):
-    return expr!=lx.TokenType.NIL and expr!=False
+    return expr != lx.TokenType.NIL and expr != False
+
 
 class Semantiff:
     def __init__(self, parser):
-        self.parser=parser
-        self.ast=parser.parse() #Directly storing the AST
-        self.symtab={}
-    
+        self.parser = parser
+        self.symtab = {}
+
     def create_variable(self, varname, value):
-        self.symtab[varname]=value
-    
+        self.symtab[varname] = value
+
     def flush(self, varname):
         del self.symtab[varname]
 
     def find(self):
-        self.ast=self.parser.parse()
-        return self.evaluate(self.ast)
-        
-    def evaluate(self, node):
-        #print(node)
+        self.astt = self.parser.parse()
+        return self.evaluate(self.astt)
 
-        if node==None: #3
+    def evaluate(self, node):
+        # print(node)
+
+        if type(node)==int or type(node)==float:
+            return node
+
+        if node is None:  # 3
             return lx.TokenType.NIL
-        
-        if type(node)==ast.Num:
+
+        if type(node) == list:
+            a=self.evaluate(node[0])
+            for child in node[1:]:
+                self.evaluate(child)
+            return a
+
+        if type(node) == astt.Num:
             return node.value
-        
-        if type(node)==ast.BoolVal:
+
+        if type(node) == astt.BoolVal:
             return node.value
-        
-        elif type(node)==ast.Var: #RHS variable
-            if node.value in self.symtab: #The 'value' is the variable name here
+
+        elif type(node) == astt.Var:  # RHS variable
+            if node.value in self.symtab:  # The 'value' is the variable name here
                 return self.symtab[node.value]
-            else: return lx.TokenType.NIL
-        
-        elif type(node)==ast.Assign:
+            else:
+                return lx.TokenType.NIL
+
+        elif type(node) == astt.Assign:
             self.create_variable(node.left.value, self.evaluate(node.right))
-            
-            if self.symtab[node.left.value]==lx.TokenType.NIL: #Clear unnecessary space
+
+            if self.symtab[node.left.value] == lx.TokenType.NIL:  # Clear unnecessary space
                 self.flush(node.left.value)
             return lx.TokenType.NIL
-        
-        elif type(node)==ast.UnaryOp:
-            if node.token==lx.TokenType.PLUS:
+
+        elif type(node) == astt.UnaryOp:
+            if node.token == lx.TokenType.PLUS:
                 return self.evaluate(node.expr)
-            elif node.token==lx.TokenType.MINUS:
+            elif node.token == lx.TokenType.MINUS:
                 return -self.evaulate(node.expr)
-            if node.token==lx.TokenType.NOT:
+            if node.token == lx.TokenType.NOT:
                 return not bool(self.evaluate(node.expr))
             else:
-                raise Exception("Unrecognised unary operator: "+str(node.token))
-                
-                
-        #Binary operation
-        elif type(node)==ast.BinOp:
-            node.token=node.token.type
+                raise Exception("Unrecognised unary operator: " + str(node.token))
+
+
+        # Binary operation
+        elif type(node) == astt.BinOp:
+            if type(node.token)!=lx.TokenType:
+                node.token = node.token.type
             # SCC Booleans
-            if node.token==lx.TokenType.OR:
-                cond = self.evaluate(node.left)
-                if bool(cond):
-                    return cond
-                else:
-                    return self.evaluate(node.right)            
-            if node.token==lx.TokenType.AND:
+            if node.token == lx.TokenType.OR:
                 cond = self.evaluate(node.left)
                 if bool(cond):
                     return cond
                 else:
                     return self.evaluate(node.right)
-                
-             
-            #Arithmetic expressions
-            if node.right.value==lx.TokenType.NIL or node.right.value==lx.TokenType.NIL:
+            if node.token == lx.TokenType.AND:
+                cond = self.evaluate(node.left)
+                if bool(cond):
+                    return cond
+                else:
+                    return self.evaluate(node.right)
+
+            # Arithmetic expressions
+            left = self.evaluate(node.left)
+            right = self.evaluate(node.right)
+            if left == lx.TokenType.NIL or right == lx.TokenType.NIL:
                 return lx.TokenType.NIL
-            
-            if node.token==lx.TokenType.EXP:
-                return self.evaluate(node.left)**self.evaluate(node.right)
-            
-            if node.token==lx.TokenType.MUL:
-                return self.evaluate(node.right)*self.evaluate(node.left)
-            if node.token==lx.TokenType.FLOAT_DIV:
-                return self.evaluate(node.left)/self.evaluate(node.right)
-            
-            if node.token==lx.TokenType.PLUS:
-                return self.evaluate(node.right)+self.evaluate(node.left)
-            if node.token==lx.TokenType.MINUS:
-                return self.evaluate(node.left)-self.evaluate(node.right)
-            
+
+            if node.token == lx.TokenType.EXP:
+                return self.evaluate(left) ** self.evaluate(right)
+
+            if node.token == lx.TokenType.MUL:
+                return self.evaluate(right) * self.evaluate(left)
+            if node.token == lx.TokenType.FLOAT_DIV:
+                return self.evaluate(left) / self.evaluate(right)
+
+            if node.token == lx.TokenType.PLUS:
+                return self.evaluate(right) + self.evaluate(left)
+            if node.token == lx.TokenType.MINUS:
+                return self.evaluate(left) - self.evaluate(right)
+
             else:
-                raise Exception("Unrecognised binary operator: "+str(node.token))
-                
-         
-        #While loop
-        elif type(node)==ast.While:
+                raise Exception("Unrecognised binary operator: " + str(node.token))
+
+
+        # While loop
+        elif type(node) == astt.While:
             a = 0
             while self.evaluate(node.test):
-                a=self.evaluate(node.body)
+                a = self.evaluate(node.body)
             return a
-        
-        
-        if type(node)==ast.Compare:
-            if (type(node.left)==ast.Var):
-                node.left=self.symtab[node.left.token.value]
 
-            if (type(node.right)==ast.Var):
-                node.right=self.symtab[node.right.token.value]
+        if type(node) == astt.Compare:
+            if (type(node.left) == astt.Var):
+                left = self.symtab[node.left.token.value]
 
-            if (type(node.left)==ast.Num):
-                node.left=node.left.value
-            if (type(node.right)==ast.Num):
-                node.right=node.right.value
+            if (type(node.right) == astt.Var):
+                right = self.symtab[node.right.token.value]
 
-            if (node.left==lx.TokenType.NIL or node.right==lx.TokenType.NIL):
+            if (type(node.left) == astt.Num):
+                left = node.left.value
+            if (type(node.right) == astt.Num):
+                right = node.right.value
+
+            if (node.left == lx.TokenType.NIL or node.right == lx.TokenType.NIL):
                 return lx.TokenType.NIL
             else:
-                if node.op.type==lx.TokenType.GT:
-                    return node.left>node.right
-                elif node.op.type==lx.TokenType.LT:
-                    return node.left<node.right
-                elif node.op.type==lx.TokenType.GEQ:
-                    return node.left>=node.right
-                elif node.op.type==lx.TokenType.LEQ:
-                    return node.left<=node.right
-                elif node.op.type==lx.TokenType.EQUAL:
-                    return node.left==node.right
-                elif node.op.type==lx.TokenType.NOTEQUAL:
-                    return node.left!=node.right
+                if node.op.type == lx.TokenType.GT:
+                    return left > right
+                elif node.op.type == lx.TokenType.LT:
+                    return left < right
+                elif node.op.type == lx.TokenType.GEQ:
+                    return left >= right
+                elif node.op.type == lx.TokenType.LEQ:
+                    return left <= right
+                elif node.op.type == lx.TokenType.EQUAL:
+                    return left == right
+                elif node.op.type == lx.TokenType.NOTEQUAL:
+                    return left != right
                 else:
-                    raise Exception("Unrecognised compare operator: "+str(node.op))
+                    raise Exception("Unrecognised compare operator: " + str(node.op))
 
-        #If-elif-else ladder
-        elif type(node)==ast.If:
+        # If-elif-else ladder
+        elif type(node) == astt.If:
             if self.evaluate(node.test):
                 return self.evaluate(node.body)
             else:
                 return self.evaluate(node.alt)
-            
 
-        if type(node)==ast.Compound:
-            a=self.evaluate(node.children[0])
+        if type(node) == astt.Compound:
+            a = self.evaluate(node.children[0])
             for stmt in node.children[1:]:
                 self.evaluate(stmt)
             return a
 
-        if type(node)==ast.Block:
+        if type(node) == astt.Block:
             return self.evaluate(node.compound_statement)
 
-        if type(node)==ast.Program:
+        if type(node) == astt.Program:
             return self.evaluate(node.block)
         # Find weird tokens    
         else:
-            raise Exception("Unexpected token error: "+str(type(node)))
+            raise Exception("Unexpected token error: " + str(type(node)))

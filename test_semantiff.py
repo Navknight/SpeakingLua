@@ -1,11 +1,11 @@
 #This file is meant to test smt.py
 
 import lexer as lx
-import ast as syn
+import astt as syn
 import smt as tiff
 
 def main():
-    with open('test_lexer.txt') as f:
+    with open('code.txt') as f:
         text = f.read()
     lex = lx.Lexer(text)
     par = syn.Parser(lex)
