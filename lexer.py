@@ -48,7 +48,6 @@ class TokenType(Enum):
     END = 'end'
     FALSE = 'false'
     FOR = 'for'
-    FUNCTION = 'function'
     GOTO = 'goto'
     IF = 'if'
     IN = 'in'
@@ -63,6 +62,7 @@ class TokenType(Enum):
     UNTIL = 'until'
     WHILE = 'while'
     PRINT = 'print'
+    FUNCTION = 'function'
 
     # single-character token types
     PLUS = '+' # +

@@ -1,6 +1,9 @@
-a=0
-b=0
-while (a<10) do
-a=a+1
-b=b+a*a*a
+a = 100
+b = a+50
+if (b>a)
+then
+c = 200
+else
+c = 100
 end
+
