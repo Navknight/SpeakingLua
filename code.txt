@@ -1,6 +1,14 @@
-a=0
-b=0
-while (a<10) do
-a=a+1
-b=b+a*a*a
+a = 100
+if( a == 10 )
+then
+    a = a*10
+elseif( a == 20 )
+then   
+    a=a*20
+elseif( a == 30 )
+then
+    a=a*30
+else
+    a=a*40
 end
+
